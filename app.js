@@ -189,22 +189,6 @@
       });
     }
 
-    function csvEscape(value) {
-      return `"${String(value ?? "").replace(/"/g, '""')}"`;
-    }
-
-    function downloadCsv() {
-      const header = ["annotator_id", "study_id", "identity_preference", "target_preference", "overall_preference", "unclear", "notes", "nickname", "submitted_at"];
-      const lines = [header.join(",")].concat(responseRows().map((row) => header.map((key) => csvEscape(row[key])).join(",")));
-      const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `annotation_responses_${state.annotatorId}.csv`;
-      link.click();
-      URL.revokeObjectURL(url);
-    }
-
     function submitToSheet() {
       const missing = missingCases();
       const status = $("statusText");
@@ -219,10 +203,9 @@
         status.textContent = "Isi nickname atau inisial sebelum submit.";
         return;
       }
-      downloadCsv();
       if (!GOOGLE_SCRIPT_URL.trim()) {
         status.className = "status warn";
-        status.textContent = "CSV sudah didownload. Submit online belum aktif.";
+        status.textContent = "Submit online belum aktif.";
         return;
       }
 
@@ -243,7 +226,7 @@
       document.body.appendChild(form);
       form.submit();
       form.remove();
-      status.textContent = "Submit terkirim. CSV backup juga sudah didownload.";
+      status.textContent = "Submit terkirim.";
     }
 
     function openZoom(link) {
@@ -290,7 +273,6 @@
     $("prevButton").addEventListener("click", () => { state.current = Math.max(0, state.current - 1); save(); render(); });
     $("nextButton").addEventListener("click", () => { state.current = Math.min(CASES.length - 1, state.current + 1); save(); render(); });
     $("clearButton").addEventListener("click", clearCurrentAnswer);
-    $("downloadButton").addEventListener("click", downloadCsv);
     $("submitButton").addEventListener("click", submitToSheet);
     $("missingButton").addEventListener("click", () => {
       const index = nextMissingIndex();
