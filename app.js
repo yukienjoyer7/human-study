@@ -194,6 +194,22 @@
       });
     }
 
+    function csvEscape(value) {
+      return `"${String(value ?? "").replace(/"/g, '""')}"`;
+    }
+
+    function downloadCsv(rows) {
+      const header = ["annotator_id", "study_id", "identity_preference", "target_preference", "overall_preference", "unclear", "notes", "nickname", "submitted_at"];
+      const lines = [header.join(",")].concat(rows.map((row) => header.map((key) => csvEscape(row[key])).join(",")));
+      const blob = new Blob([lines.join("\n") + "\n"], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `annotation_responses_${state.annotatorId}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
     async function submitToSheet() {
       const missing = missingCases();
       const status = $("statusText");
@@ -219,6 +235,7 @@
         nickname: state.nickname.trim(),
         rows: responseRows()
       };
+      downloadCsv(payload.rows);
       try {
         status.textContent = "Submitting...";
         const response = await fetch(GOOGLE_SCRIPT_URL.trim(), {
