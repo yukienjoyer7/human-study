@@ -89,8 +89,10 @@
     .case-nav .done { border-color: var(--accent); background: var(--accent-weak); }
     .case-nav .current { outline: 2px solid var(--accent); outline-offset: 1px; }
     .review { margin-top: 14px; padding: 14px 16px; display: grid; gap: 10px; }
+    .review.complete { border-color: #b7dbc9; background: #fbfffd; }
     .review h3 { margin: 0; font-size: 16px; }
     .status { min-height: 22px; color: var(--muted); }
+    .status.ready { color: #0d513a; font-weight: 700; }
     .status.warn { color: var(--warn); }
     .status.bad { color: var(--bad); }
     .missing { margin: 0; padding: 10px 12px; border-radius: 6px; background: var(--warn-weak); color: var(--warn); display: none; }
@@ -320,15 +322,23 @@
     function renderReview() {
       const missing = missingCases();
       const box = $("missingBox");
+      const status = $("statusText");
+      $("statusText").closest(".review").classList.toggle("complete", !missing.length && !!state.nickname.trim());
+      status.className = "status";
       if (missing.length) {
         box.style.display = "block";
         box.textContent = `Belum lengkap: ${missing.slice(0, 18).join(", ")}${missing.length > 18 ? " ..." : ""}`;
+        status.textContent = `${CASES.length - missing.length}/${CASES.length} complete`;
       } else if (!state.nickname.trim()) {
         box.style.display = "block";
         box.textContent = "Isi nickname atau inisial sebelum submit.";
+        status.className = "status ready";
+        status.textContent = `${CASES.length}/${CASES.length} complete. Add nickname to submit.`;
       } else {
         box.style.display = "none";
         box.textContent = "";
+        status.className = "status ready";
+        status.textContent = `${CASES.length}/${CASES.length} complete. Ready to submit.`;
       }
     }
 
