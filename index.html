@@ -61,8 +61,14 @@
     .image-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px; }
     figure { margin: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
     figure a { display: block; }
+    .zoom-link { cursor: zoom-in; }
     img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: #eef0eb; }
     figcaption { display: flex; justify-content: center; align-items: center; min-height: 38px; font-weight: 700; }
+    .zoom-dialog { width: min(94vw, 920px); padding: 0; border: 0; border-radius: 8px; background: #111; color: #fff; }
+    .zoom-dialog::backdrop { background: rgba(0, 0, 0, .72); }
+    .zoom-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; }
+    .zoom-head button { background: transparent; border-color: rgba(255, 255, 255, .5); color: #fff; }
+    .zoom-dialog img { width: 100%; max-height: 80vh; aspect-ratio: auto; object-fit: contain; background: #111; }
     .questions { display: grid; gap: 12px; padding: 0 16px 16px; }
     .question { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(360px, 2fr); gap: 10px; align-items: center; }
     .q-label { font-weight: 700; }
@@ -167,6 +173,14 @@
     </section>
   </main>
 
+  <dialog class="zoom-dialog" id="zoomDialog" aria-label="Preview gambar">
+    <div class="zoom-head">
+      <strong id="zoomTitle"></strong>
+      <button type="button" id="zoomClose">Tutup</button>
+    </div>
+    <img id="zoomImage" alt="">
+  </dialog>
+
   <iframe class="hidden-frame" name="sheetSink" title="hidden submit target"></iframe>
 
   <script>
@@ -268,7 +282,7 @@
         ["B", item.B]
       ].map(([label, src]) => `
         <figure>
-          <a href="${src}" target="_blank" rel="noopener">
+          <a class="zoom-link" href="${src}" target="_blank" rel="noopener" data-zoom="${label}">
             <img src="${src}" alt="${label} image" loading="eager">
           </a>
           <figcaption>${label}</figcaption>
@@ -383,7 +397,20 @@
       status.textContent = "Submit terkirim. CSV backup juga sudah didownload.";
     }
 
+    function openZoom(link) {
+      $("zoomTitle").textContent = link.dataset.zoom;
+      $("zoomImage").src = link.href;
+      $("zoomImage").alt = `${link.dataset.zoom} image`;
+      $("zoomDialog").showModal();
+    }
+
     document.addEventListener("click", (event) => {
+      const zoom = event.target.closest("[data-zoom]");
+      if (zoom) {
+        event.preventDefault();
+        openZoom(zoom);
+        return;
+      }
       const choice = event.target.closest("[data-choice]");
       if (choice) {
         const item = CASES[state.current];
@@ -415,6 +442,10 @@
     $("nextButton").addEventListener("click", () => { state.current = Math.min(CASES.length - 1, state.current + 1); save(); render(); });
     $("downloadButton").addEventListener("click", downloadCsv);
     $("submitButton").addEventListener("click", submitToSheet);
+    $("zoomClose").addEventListener("click", () => $("zoomDialog").close());
+    $("zoomDialog").addEventListener("click", (event) => {
+      if (event.target === $("zoomDialog")) $("zoomDialog").close();
+    });
     $("newIdButton").addEventListener("click", () => {
       if (Object.keys(state.answers).length && !confirm("Mulai draft dengan ID baru di browser ini? Draft ID lama tetap tersimpan di browser.")) return;
       state.annotatorId = makeId();
