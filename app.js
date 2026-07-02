@@ -194,7 +194,7 @@
       });
     }
 
-    function submitToSheet() {
+    async function submitToSheet() {
       const missing = missingCases();
       const status = $("statusText");
       status.className = "status";
@@ -219,19 +219,19 @@
         nickname: state.nickname.trim(),
         rows: responseRows()
       };
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = GOOGLE_SCRIPT_URL.trim();
-      form.target = "sheetSink";
-      form.style.display = "none";
-      const input = document.createElement("input");
-      input.name = "payload";
-      input.value = JSON.stringify(payload);
-      form.appendChild(input);
-      document.body.appendChild(form);
-      form.submit();
-      form.remove();
-      status.textContent = "Submit terkirim.";
+      try {
+        status.textContent = "Submitting...";
+        const response = await fetch(GOOGLE_SCRIPT_URL.trim(), {
+          method: "POST",
+          body: new URLSearchParams({ payload: JSON.stringify(payload) })
+        });
+        const result = await response.json();
+        if (!result.ok) throw new Error(result.error || "submit failed");
+        status.textContent = "Submit terkirim.";
+      } catch (err) {
+        status.className = "status bad";
+        status.textContent = `Submit gagal: ${err.message}`;
+      }
     }
 
     function openZoom(link) {

@@ -97,8 +97,6 @@
     .status.warn { color: var(--warn); }
     .status.bad { color: var(--bad); }
     .missing { margin: 0; padding: 10px 12px; border-radius: 6px; background: var(--warn-weak); color: var(--warn); display: none; }
-    .hidden-frame { display: none; width: 0; height: 0; border: 0; }
-
     @media (max-width: 760px) {
       .wrap { width: min(100% - 20px, 1180px); }
       .topbar, .case-head, .actions { align-items: stretch; flex-direction: column; }
@@ -197,8 +195,6 @@
     <img id="zoomImage" alt="">
   </dialog>
 
-  <iframe class="hidden-frame" name="sheetSink" title="hidden submit target"></iframe>
-
-  <script src="app.js?v=20260702-4"></script>
+  <script src="app.js?v=20260702-5"></script>
 </body>
 </html>
