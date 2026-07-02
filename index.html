@@ -146,7 +146,7 @@
         </div>
         <div>
           <button type="button" id="downloadButton">Download CSV</button>
-          <button type="button" class="primary" id="submitButton">Submit ke Sheet</button>
+          <button type="button" class="primary" id="submitButton">Submit</button>
         </div>
       </div>
     </section>
@@ -250,8 +250,8 @@
 
       $("annotatorId").textContent = state.annotatorId;
       $("nickname").value = state.nickname;
-      $("caseId").textContent = item.study_id;
-      $("attribute").textContent = item.attribute;
+      $("caseId").textContent = `Target: ${item.attribute}`;
+      $("attribute").textContent = "";
       $("caseCounter").textContent = `${state.current + 1} / ${CASES.length}`;
       $("progressPill").textContent = `${count}/${CASES.length} selesai`;
       $("progressText").textContent = `${count} dari ${CASES.length} selesai`;
@@ -359,7 +359,7 @@
       downloadCsv();
       if (!GOOGLE_SCRIPT_URL.trim()) {
         status.className = "status warn";
-        status.textContent = "CSV sudah didownload. Google Sheet belum aktif karena GOOGLE_SCRIPT_URL masih kosong.";
+        status.textContent = "CSV sudah didownload. Submit online belum aktif.";
         return;
       }
 
@@ -380,7 +380,7 @@
       document.body.appendChild(form);
       form.submit();
       form.remove();
-      status.textContent = "Submit dikirim ke Google Sheet. CSV backup juga sudah didownload.";
+      status.textContent = "Submit terkirim. CSV backup juga sudah didownload.";
     }
 
     document.addEventListener("click", (event) => {
