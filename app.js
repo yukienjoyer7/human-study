@@ -79,7 +79,7 @@
     }
 
     function missingCases() {
-      return CASES.filter((item) => !complete(item)).map((item) => item.study_id);
+      return CASES.map((item, index) => [item, index]).filter(([item]) => !complete(item));
     }
 
     function render() {
@@ -141,7 +141,8 @@
       status.className = "status";
       if (missing.length) {
         box.style.display = "block";
-        box.textContent = `Belum lengkap: ${missing.slice(0, 18).join(", ")}${missing.length > 18 ? " ..." : ""}`;
+        const labels = missing.map(([, index]) => String(index + 1).padStart(2, "0"));
+        box.textContent = `Belum lengkap: ${labels.slice(0, 18).join(", ")}${missing.length > 18 ? " ..." : ""}`;
         missingButton.style.display = "inline-block";
         missingButton.textContent = `Review missing only (${missing.length})`;
         status.textContent = `${CASES.length - missing.length}/${CASES.length} complete`;
