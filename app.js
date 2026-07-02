@@ -19,6 +19,10 @@
     state.current = Math.min(Math.max(state.current, 0), CASES.length - 1);
 
     const $ = (id) => document.getElementById(id);
+    const on = (id, event, handler) => {
+      const el = $(id);
+      if (el) el.addEventListener(event, handler);
+    };
     let saveTimer;
 
     function pickAnnotatorId() {
@@ -260,21 +264,21 @@
       }
     });
 
-    $("nickname").addEventListener("input", (event) => {
+    on("nickname", "input", (event) => {
       state.nickname = event.target.value.slice(0, 60);
       save();
       renderReview();
       $("submitButton").disabled = completeCount() !== CASES.length || !state.nickname.trim();
     });
-    $("caseNotes").addEventListener("input", (event) => {
+    on("caseNotes", "input", (event) => {
       answerFor(CASES[state.current].study_id).notes = event.target.value.slice(0, 400);
       save();
     });
-    $("prevButton").addEventListener("click", () => { state.current = Math.max(0, state.current - 1); save(); render(); });
-    $("nextButton").addEventListener("click", () => { state.current = Math.min(CASES.length - 1, state.current + 1); save(); render(); });
-    $("clearButton").addEventListener("click", clearCurrentAnswer);
-    $("submitButton").addEventListener("click", submitToSheet);
-    $("missingButton").addEventListener("click", () => {
+    on("prevButton", "click", () => { state.current = Math.max(0, state.current - 1); save(); render(); });
+    on("nextButton", "click", () => { state.current = Math.min(CASES.length - 1, state.current + 1); save(); render(); });
+    on("clearButton", "click", clearCurrentAnswer);
+    on("submitButton", "click", submitToSheet);
+    on("missingButton", "click", () => {
       const index = nextMissingIndex();
       if (index < 0) return;
       state.current = index;
@@ -282,11 +286,11 @@
       render();
       scrollTo({ top: 0, behavior: "smooth" });
     });
-    $("zoomClose").addEventListener("click", () => $("zoomDialog").close());
-    $("zoomDialog").addEventListener("click", (event) => {
+    on("zoomClose", "click", () => $("zoomDialog").close());
+    on("zoomDialog", "click", (event) => {
       if (event.target === $("zoomDialog")) $("zoomDialog").close();
     });
-    $("newIdButton").addEventListener("click", () => {
+    on("newIdButton", "click", () => {
       if (Object.keys(state.answers).length && !confirm("Mulai draft dengan ID baru di browser ini? Draft ID lama tetap tersimpan di browser.")) return;
       state.annotatorId = makeId();
       state.answers = readJson(`${STORE}:answers:${state.annotatorId}`, {});
